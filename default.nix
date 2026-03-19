@@ -1,30 +1,17 @@
 {
   pkgs,
-  lib,
   modulesPath,
   ...
-}: let
-  system = "aarch64-linux";
-in {
+}: {
   imports = [
     (modulesPath + "/profiles/base.nix")
     (modulesPath + "/profiles/installation-device.nix")
-    (modulesPath + "/installer/cd-dvd/sd-image.nix")
-    ./kboot-conf
+    (modulesPath + "/installer/sd-card/sd-image.nix")
+    ./kboot-conf.nix
   ];
-
-  nixpkgs = {
-    overlays = [(import ./packages)];
-    crossSystem =
-      lib.mkIf (
-        pkgs.stdenv.hostPlatform.system != system
-      )
-      {inherit system;};
-  };
 
   boot.loader.grub.enable = false;
   boot.consoleLogLevel = 7;
-  boot.loader.generic-extlinux-compatible.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [
     "console=ttyAML0,115200n8"
@@ -41,4 +28,13 @@ in {
   ];
 
   hardware.deviceTree.name = "amlogic/meson-g12b-odroid-n2-plus.dtb";
+
+  # Is this necessary?
+  # sdImage.populateFirmwareCommands = let
+  #   configTxt = pkgs.writeText "README" ''
+  #     Nothing to see here. This empty partition is here because I don't know how to turn its creation off.
+  #   '';
+  # in ''
+  #   cp ${configTxt} firmware/README
+  # '';
 }
