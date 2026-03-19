@@ -10,6 +10,7 @@ in {
     (modulesPath + "/profiles/base.nix")
     (modulesPath + "/profiles/installation-device.nix")
     (modulesPath + "/installer/cd-dvd/sd-image.nix")
+    ./kboot-conf
   ];
 
   nixpkgs = {
