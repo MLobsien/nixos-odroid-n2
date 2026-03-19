@@ -29,12 +29,11 @@
 
   hardware.deviceTree.name = "amlogic/meson-g12b-odroid-n2-plus.dtb";
 
-  # Is this necessary?
-  # sdImage.populateFirmwareCommands = let
-  #   configTxt = pkgs.writeText "README" ''
-  #     Nothing to see here. This empty partition is here because I don't know how to turn its creation off.
-  #   '';
-  # in ''
-  #   cp ${configTxt} firmware/README
-  # '';
+  sdImage.populateFirmwareCommands = let
+    configTxt = pkgs.writeText "README" ''
+      Nothing to see here. This empty partition is here because I don't know how to turn its creation off.
+    '';
+  in ''
+    cp ${configTxt} firmware/README
+  '';
 }
