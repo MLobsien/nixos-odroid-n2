@@ -15,7 +15,7 @@ with lib; let
       target=/kboot.conf
       default=""
 
-      while getopts "t:c:d:g:n:" opt; do
+      while getopts "c:d:" opt; do
           case "$opt" in
               c) default="$OPTARG" ;;
               d) target="$OPTARG" ;;
