@@ -91,8 +91,18 @@ in {
       boot.loader.id = "kboot-conf";
     };
 
-    sdImage.populateRootCommands = ''
-      ${mkBuilder pkgs.buildPackages} -c ${config.system.build.toplevel} -d ./files/kboot.conf
-    '';
+    sdImage = {
+      populateRootCommands = ''
+        ${mkBuilder pkgs.buildPackages} -c ${config.system.build.toplevel} -d ./files/kboot.conf
+      '';
+
+      populateFirmwareCommands = let
+        configTxt = pkgs.writeText "README" ''
+          Nothing to see here. This empty partition is here because I don't know how to turn its creation off.
+        '';
+      in ''
+        cp ${configTxt} firmware/README
+      '';
+    };
   };
 }
