@@ -4,7 +4,7 @@
   lib,
   ...
 }: let
-  uboot-unwrapped = pkgs.pkgsCross.aarch64-multiplatform.buildUBoot {
+  uboot-unwrapped = pkgs.buildUBoot {
     version = "v2026-03-17";
     src = pkgs.fetchFromGitHub {
       owner = "u-boot";
