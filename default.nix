@@ -8,6 +8,7 @@
     (modulesPath + "/profiles/installation-device.nix")
     (modulesPath + "/installer/sd-card/sd-image.nix")
     ./kboot-conf.nix
+    ./uboot.nix
   ];
 
   boot.loader.grub.enable = false;
@@ -15,15 +16,8 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [
     "console=ttyAML0,115200n8"
-    "no_console_suspend"
-    "consoleblank=0"
     "fsck.fix=yes"
     "fsck.repair=yes"
-    "net.ifnames=0"
-    "elevator=noop"
-    "enable_wol=1"
-    "usb-xhci.tablesize=2"
-    "maxcpus=6"
     "hdmitx=cec3f"
   ];
 

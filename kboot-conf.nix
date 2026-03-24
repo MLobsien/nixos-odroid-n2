@@ -5,76 +5,69 @@
   ...
 }: let
   cfg = config.boot.loader.kboot-conf;
-  mkBuilder = p:
-    p.writeShellScript "kboot-conf-builder" ''
-      shopt -s nullglob
+  mkBuilder = p: ''
+    shopt -s nullglob
 
-      PATH=${p.lib.makeBinPath (with p; [coreutils gnused gnugrep])}
+    PATH=${p.lib.makeBinPath (with p; [coreutils gnused gnugrep])}
 
-      target=/kboot.conf
-      default=""
+    target=/kboot.conf
+    default=""
 
-      while getopts "c:d:" opt; do
-          case "$opt" in
-              c) default="$OPTARG" ;;
-              d) target="$OPTARG" ;;
-          esac
-      done
+    while getopts "c:d:" opt; do
+        case "$opt" in
+            c) default="$OPTARG" ;;
+            d) target="$OPTARG" ;;
+        esac
+    done
 
-      tmp=$target.tmp
+    tmp=$target.tmp
 
-      addEntry() {
-          local path=$(readlink -f "$1")
-          local tag="$2"
+    addEntry() {
+        local path=$(readlink -f "$1")
+        local tag="$2"
 
-          if ! test -e $path/kernel -a -e $path/initrd; then
-              return
-          fi
+        if ! test -e $path/kernel -a -e $path/initrd; then
+            return
+        fi
 
-          timestampEpoch=$(stat -L -c '%Z' $path)
-          timestamp=$(date "+%Y-%m-%d %H:%M" -d @$timestampEpoch)
-          nixosLabel="$(cat $path/nixos-version)"
-          extraParams="$(cat $path/kernel-params)"
+        timestampEpoch=$(stat -L -c '%Z' $path)
+        timestamp=$(date "+%Y-%m-%d %H:%M" -d @$timestampEpoch)
+        nixosLabel="$(cat $path/nixos-version)"
+        extraParams="$(cat $path/kernel-params)"
 
-          local kernel=$(readlink -f "$path/kernel")
-          local initrd=$(readlink -f "$path/initrd")
-          local dtbs=$(readlink -f "$path/dtbs")
+        local kernel=$(readlink -f "$path/kernel")
+        local initrd=$(readlink -f "$path/initrd")
+        local dtbs=$(readlink -f "$path/dtbs")
 
-          local id="nixos-$tag--$nixosLabel"
+        local id="nixos-$tag--$nixosLabel"
 
-          if [ "$tag" = "default" ]; then
-              echo "default=$id"
-          fi
+        if [ "$tag" = "default" ]; then
+            echo "default=$id"
+        fi
 
-          echo -n "$id='"
-          echo -n "$kernel initrd=$initrd dtb=$dtbs/${config.hardware.deviceTree.name} "
-          echo -n "systemConfig=$path init=$path/init $extraParams"
-          echo "'"
-      }
+        echo -n "$id='"
+        echo -n "$kernel initrd=$initrd dtb=$dtbs/${config.hardware.deviceTree.name} "
+        echo -n "systemConfig=$path init=$path/init $extraParams"
+        echo "'"
+    }
 
-      addEntry $default default >> $tmp
+    addEntry $default default >> $tmp
 
-      if [ ${toString cfg.configurationLimit} -gt 0 ]; then
-          for generation in $(
-                  ls -d /nix/var/nix/profiles/system-*-link \
-                  | sed 's/system-\([0-9]\+\)-link/\1/' \
-                  | head -n ${toString cfg.configurationLimit}); do
-              link=/nix/var/nix/profiles/system-$(basename $generation)-link
-              addEntry $link $generation
-          done >> $tmp
-      fi
+    if [ ${toString cfg.configurationLimit} -gt 0 ]; then
+        for generation in $(
+                ls -d /nix/var/nix/profiles/system-*-link \
+                | sed 's/system-\([0-9]\+\)-link/\1/' \
+                | head -n ${toString cfg.configurationLimit}); do
+            link=/nix/var/nix/profiles/system-$(basename $generation)-link
+            addEntry $link $generation
+        done >> $tmp
+    fi
 
-      mv -f $tmp $target
-    '';
+    mv -f $tmp $target
+  '';
 in {
   options.boot.loader.kboot-conf = {
-    enable = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = ''
-        Whether to create petitboot-compatible /kboot.conf
-      '';
-    };
+    enable = lib.mkEnableOption "creating petitboot-compatible /kboot.conf";
     configurationLimit = lib.mkOption {
       default = 10;
       example = 5;
@@ -95,13 +88,7 @@ in {
         ${mkBuilder pkgs.buildPackages} -c ${config.system.build.toplevel} -d ./files/kboot.conf
       '';
 
-      populateFirmwareCommands = let
-        configTxt = pkgs.writeText "README" ''
-          Nothing to see here. This empty partition is here because I don't know how to turn its creation off.
-        '';
-      in ''
-        cp ${configTxt} firmware/README
-      '';
+      populateFirmwareCommands = lib.mkOverride 0 "";
     };
   };
 }
