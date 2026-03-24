@@ -45,7 +45,7 @@ in {
   options.boot.loader.u-boot.enable = lib.mkEnableOption "U-Boot. This is only relevant for generating a sd image.";
 
   config = lib.mkIf config.boot.loader.u-boot.enable {
-    boot.loader.generic-extlinux-compatible = true;
+    boot.loader.generic-extlinux-compatible.enable = true;
 
     sdImage = {
       populateFirmwareCommands = ''
