@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  stdenv,
   ...
 }: let
   uboot-unwrapped = pkgs.pkgsCross.aarch64-multiplatform.buildUBoot {
@@ -17,7 +16,7 @@
     meta.platforms = ["aarch64-linux"];
     filesToInstall = ["u-boot.bin" ".config"];
   };
-  uboot-fip = stdenv.mkDerivation {
+  uboot-fip = pkgs.stdenv.mkDerivation {
     pname = "amlogic-fip-tools";
     version = "unstable";
 
