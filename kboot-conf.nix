@@ -3,8 +3,7 @@
   lib,
   pkgs,
   ...
-}:
-with lib; let
+}: let
   cfg = config.boot.loader.kboot-conf;
   mkBuilder = p:
     p.writeShellScript "kboot-conf-builder" ''
@@ -69,23 +68,23 @@ with lib; let
     '';
 in {
   options.boot.loader.kboot-conf = {
-    enable = mkOption {
+    enable = lib.mkOption {
       default = false;
-      type = types.bool;
+      type = lib.types.bool;
       description = ''
         Whether to create petitboot-compatible /kboot.conf
       '';
     };
-    configurationLimit = mkOption {
+    configurationLimit = lib.mkOption {
       default = 10;
       example = 5;
-      type = types.int;
+      type = lib.types.int;
       description = ''
         Maximum number of configurations in the generated kboot.conf.
       '';
     };
   };
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     system = {
       build.installBootLoader = mkBuilder pkgs;
       boot.loader.id = "kboot-conf";
