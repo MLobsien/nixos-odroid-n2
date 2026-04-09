@@ -19,19 +19,13 @@
       patches = [./api.patch ./make.patch];
 
       preBuild = ''
-        rm -rf mbedtls lz4
-
-        mkdir mbedtls lz4
+        rm -rf mbedtls/* lz4/*
 
         cp -r ${pkgs.lz4.dev}/include lz4
         cp -r ${pkgs.mbedtls.src}/include mbedtls
 
         ln -s ${pkgs.lz4.lib}/lib lz4/lib
         ln -s ${pkgs.mbedtls}/lib mbedtls/lib
-
-        ls lz4/lib mbedtls/lib
-
-        patchShebangs .
       '';
 
       makeFlags = ["PREFIX=$(out)/bin"];
