@@ -1,7 +1,7 @@
 {
   description = "NixOS on Odroid N2";
 
-  outputs = {...}: {
+  outputs = _: {
     nixosModules.default = import ./.;
   };
 }

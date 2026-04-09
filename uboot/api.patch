@@ -1,0 +1,48 @@
+diff --git a/lib.c b/lib.c
+index 65ec940..2196e66 100644
+--- a/lib.c
++++ b/lib.c
+@@ -4,11 +4,11 @@
+ int sha256n(size_t nbuf, uchar_t *buf[], size_t size[], uchar_t *digest_buf) {
+     mbedtls_sha256_context ctx;
+     mbedtls_sha256_init(&ctx);
+-    mbedtls_sha256_starts_ret(&ctx, 0); // 0 means use sha256.
++    mbedtls_sha256_starts(&ctx, 0); // 0 means use sha256.
+     for(size_t i = 0; i < nbuf; i++) {
+-        mbedtls_sha256_update_ret(&ctx, buf[i], size[i]);
++        mbedtls_sha256_update(&ctx, buf[i], size[i]);
+     }
+-    mbedtls_sha256_finish_ret(&ctx, digest_buf);
++    mbedtls_sha256_finish(&ctx, digest_buf);
+     mbedtls_sha256_free(&ctx);
+     return 0;
+ }
+@@ -41,7 +41,7 @@ int file_sha256(char *fname, uchar_t *digest_buf) {
+ 
+     mbedtls_sha256_context ctx;
+     mbedtls_sha256_init(&ctx);
+-    mbedtls_sha256_starts_ret(&ctx, 0); // 0 means use sha256.
++    mbedtls_sha256_starts(&ctx, 0); // 0 means use sha256.
+ 
+     void *buf = malloc(0x10000);
+     size_t buf_size = 0;
+@@ -51,10 +51,10 @@ int file_sha256(char *fname, uchar_t *digest_buf) {
+         } else {
+             buf_size = fread(buf, 1, 0x10000, fin);
+         }
+-        mbedtls_sha256_update_ret(&ctx, buf, buf_size);
++        mbedtls_sha256_update(&ctx, buf, buf_size);
+         size -= buf_size;
+     }
+-    mbedtls_sha256_finish_ret(&ctx, digest_buf);
++    mbedtls_sha256_finish(&ctx, digest_buf);
+     mbedtls_sha256_free(&ctx);
+ 
+     fclose(fin);
+@@ -137,4 +137,4 @@ int file_append(char *src, char *dst) {
+     if(fsrc != NULL) fclose(fsrc);
+ 
+     return ret;
+-}
+\ No newline at end of file
++}

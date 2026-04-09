@@ -4,10 +4,8 @@
   lib,
   ...
 }: let
-  fip = pkgs.stdenv.mkDerivation {
-    name = "fip";
-
-    MESON64-TOOLS = pkgs.stdenv.mkDerivation {
+  fip = let
+    meson64-tools = pkgs.stdenv.mkDerivation {
       name = "meson64-tools";
       src = pkgs.fetchFromGitHub {
         owner = "angerman";
@@ -16,20 +14,31 @@
         sha256 = "/koIsslDNpaFHf1TV/0Xt0TiyhjL6tCz2oHQraYNhPA=";
       };
 
-      nativeBuildInputs = [pkgs.python2 pkgs.python3];
+      nativeBuildInputs = with pkgs; [lz4 mbedtls];
+
+      patches = [./api.patch ./make.patch];
 
       preBuild = ''
+        rm -rf mbedtls lz4
+
+        mkdir mbedtls lz4
+
+        cp -r ${pkgs.lz4.dev}/include lz4
+        cp -r ${pkgs.mbedtls.src}/include mbedtls
+
+        ln -s ${pkgs.lz4.lib}/lib lz4/lib
+        ln -s ${pkgs.mbedtls}/lib mbedtls/lib
+
+        ls lz4/lib mbedtls/lib
+
         patchShebangs .
-        patchShebangs ./mbedtls/scripts/generate_psa_constants.py
       '';
 
       makeFlags = ["PREFIX=$(out)/bin"];
     };
 
-    FIP_TOOLS = pkgs.stdenv.mkDerivation {
-      pname = "amlogic-fip-tools";
-      version = "unstable";
-
+    fip-tools = pkgs.stdenv.mkDerivation {
+      name = "amlogic-fip-tools";
       src = pkgs.fetchFromGitHub {
         owner = "LibreELEC";
         repo = "amlogic-boot-fip";
@@ -42,9 +51,18 @@
         coreutils
         mktemp
       ];
+
+      preBuild = ''
+        patchShebangs $src/odroid-n2/blx_fix.sh
+      '';
+
+      buildPhase = ''
+        mkdir -p $out
+        cp -r $src/odroid-n2 $out
+      '';
     };
 
-    UBOOT = pkgs.buildUBoot {
+    u-boot = pkgs.buildUBoot {
       version = "v2026-03-17";
       src = pkgs.fetchFromGitHub {
         owner = "u-boot";
@@ -56,12 +74,13 @@
       meta.platforms = ["aarch64-linux"];
       filesToInstall = ["u-boot.bin" ".config"];
     };
+  in
+    pkgs.stdenv.mkDerivation {
+      name = "fip";
 
-    buildPhase = ''
-      mkdir -p $TMPDIR/tools
-      ln -s $MESON64_TOOLS/
-    '';
-  };
+      buildPhase = ''
+      '';
+    };
 in {
   options.boot.loader.u-boot.enable = lib.mkEnableOption "U-Boot. This is only relevant for generating a sd image.";
 
