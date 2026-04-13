@@ -19,6 +19,8 @@
           -d ./files/boot
       '';
 
+      populateFirmwareCommands = "";
+
       # Write the signed FIP directly to the MBR/pre-partition area.
       # Sector 0 = MBR, sector 1-2047 = MBR gap (where Amlogic boot ROM
       # reads bl2 from), sector 2048+ = root partition.
