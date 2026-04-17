@@ -1,6 +1,6 @@
 {
   pkgs,
-  uboot,
+  u-boot,
   ...
 }: let
   inherit (pkgs) stdenv fetchFromGitHub lz4 coreutils;
@@ -15,7 +15,7 @@ in
       sha256 = "sha256-jKBym2QYeWpjFEHOSYprqG59zO/jZ7zUjfKWekf1MYw=";
     };
 
-    nativeBuildInputs = [uboot lz4 coreutils];
+    nativeBuildInputs = [u-boot lz4 coreutils];
 
     buildPhase = ''
       fip=$src/odroid-n2
@@ -34,7 +34,7 @@ in
       ${coreutils}/bin/dd if=$fip/acs.bin  of=bl21_zero.bin conv=notrunc 2>/dev/null
       cat bl2_zero.bin bl21_zero.bin > bl2_new.bin
 
-      cp ${uboot}/u-boot.bin ./bl33.bin
+      cp ${u-boot}/u-boot.bin ./bl33.bin
       lz4 -f -12 ./bl33.bin ./bl33.bin.lz4
 
       AML_ENCRYPT=$fip/aml_encrypt_g12b

@@ -8,7 +8,10 @@
   };
 
   config = lib.mkIf config.boot.loader.u-boot.enable {
-    boot.loader.generic-extlinux-compatible.enable = true;
+    boot.loader.generic-extlinux-compatible = {
+      enable = true;
+      configurationLimit = 0;
+    };
 
     sdImage = {
       # Shell variables available here:
@@ -27,7 +30,7 @@
       # The FAT /boot/firmware partition is not used on Amlogic — we erase
       # its entry from the MBR partition table below.
       postBuildCommands = ''
-        dd if=${fip}/u-boot.bin.sd.bin of=$img bs=512 seek=1 conv=notrunc
+        dd if=${fip}/bin/u-boot.bin.sd.bin of=$img bs=512 seek=1 conv=notrunc
 
         # Zero out the FAT partition entry (type 0x0B) so it is invisible
         # to host tools and does not confuse the Amlogic boot ROM.
