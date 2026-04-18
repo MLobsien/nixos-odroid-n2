@@ -1,11 +1,10 @@
 {fip}: {
   config,
   lib,
+  targetSystem,
   ...
 }: {
-  options.boot.loader.u-boot = {
-    enable = lib.mkEnableOption "U-Boot bootloader (SD image) for Odroid N2";
-  };
+  options.boot.loader.u-boot.enable = lib.mkEnableOption "U-Boot bootloader (SD image) for Odroid N2";
 
   config = lib.mkIf config.boot.loader.u-boot.enable {
     boot.loader.generic-extlinux-compatible = {
@@ -14,11 +13,9 @@
     };
 
     sdImage = {
-      # Shell variables available here:
-      #   $img  — path to the raw SD image file
       populateRootCommands = ''
         ${config.boot.loader.generic-extlinux-compatible.populateCmd} \
-          -c ${config.system.build.toplevel} \
+          -c ${targetSystem.config.system.build.toplevel} \
           -d ./files/boot
       '';
 

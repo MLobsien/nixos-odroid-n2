@@ -3,7 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixos-odroid-n2.url = "github:MLobsien/nixos-odroid-n2";
+    nixos-odroid-n2 = {
+      url = "github:MLobsien/nixos-odroid-n2";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -28,7 +31,15 @@
         nixos-odroid-n2.nixosModules.default
       ];
 
+      # Pin kernel to 6.12 which works with ZFS
+      boot.kernelPackages = pkgs.linuxPackages_6_12;
+
       boot.loader.u-boot.enable = true;
+
+      fileSystems."/" = lib.mkForce {
+        device = "/dev/mmcblk0p2";
+        fsType = "ext4";
+      };
 
       system.stateVersion = "24.11";
 
@@ -47,16 +58,16 @@
       ];
     };
 
-    # build on x86
+    # build on x86 - passes targetSystem so the u-boot module can use aarch64 toplevel
     sdImageSystem = lib.nixosSystem {
       inherit pkgs;
-      specialArgs = {inherit targetSystem;};
+      specialArgs = { inherit targetSystem; };
       modules = [
         minimalModule
       ];
     };
   in {
-    packages.x86_64-linux = {inherit sdImageSystem;};
+    packages.x86_64-linux.default = sdImageSystem.config.system.build.sdImage;
 
     nixosConfigurations.default = targetSystem;
   };

@@ -25,22 +25,18 @@ in
       sha256 = "sha256-eLZzodCDL+6Vg8/ncqjf54Tk5MIG6mz+u0Lo84eLX9k=";
     };
 
-    nativeBuildInputs = [
-      pkgs.bash
-      pkgs.bc
-      pkgs.bison
-      pkgs.dtc
-      pkgs.flex
-      pkgs.gnutls.dev
-      pkgs.openssl.dev
-      pkgs.pkg-config
-      (pkgs.python3.withPackages (p: [p.libfdt p.pyelftools p.setuptools]))
+    nativeBuildInputs = with pkgs; [
+      bash
+      bc
+      bison
+      dtc
+      flex
+      gnutls.dev
+      openssl.dev
+      pkg-config
+      (python3.withPackages (p: [p.libfdt p.pyelftools p.setuptools]))
     ];
 
-    # Patch shebangs so scripts use Nix-store interpreters.  Without --build,
-    # patchShebangs tries to execute each script to probe the interpreter, which
-    # fails in the sandbox when /usr/bin/env does not exist.  The --build flag
-    # rewrites shebangs without running the scripts.
     postPatch = ''
       patchShebangs --build tools scripts
     '';
