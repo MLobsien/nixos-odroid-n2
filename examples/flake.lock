@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776503640,
-        "narHash": "sha256-qZNLTlJD8ls7tD3JY4PQw8bKBk0Q/6DqSRt0oZU3Zog=",
+        "lastModified": 1776605046,
+        "narHash": "sha256-i4qAryd+z7AOTHQ4i6U3DgXLIAAbn8A24d9g4oyR2G8=",
         "owner": "MLobsien",
         "repo": "nixos-odroid-n2",
-        "rev": "fd781cb6fe66fdaef4a4d25a56adee0cfe4d7603",
+        "rev": "8eef2c1793143202ad06d6c667e2770c680c3d86",
         "type": "github"
       },
       "original": {
