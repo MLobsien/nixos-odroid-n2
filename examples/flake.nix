@@ -17,22 +17,23 @@
     inherit (nixpkgs) lib;
 
     # Native x86_64 pkgs — for the sd-image builder (mkfs.ext4, sfdisk, etc.)
-    pkgs = import nixpkgs {system = "x86_64-linux";};
+    pkgs = import nixpkgs {
+      system = "x86_64-linux";
+      config.allowBroken = true;
+    };
 
     # Cross aarch64 pkgs — cross-compiled on x86_64 for aarch64 Odroid N2.
     # crossSystem sets target to aarch64-linux while building natively on x86_64.
     crossPkgs = import nixpkgs {
       system = "x86_64-linux";
       crossSystem = "aarch64-linux";
+      config.allowBroken = true;
     };
 
     minimalModule = {
       imports = [
         nixos-odroid-n2.nixosModules.default
       ];
-
-      # Pin kernel to 6.12 which works with ZFS
-      boot.kernelPackages = pkgs.linuxPackages_6_12;
 
       boot.loader.u-boot.enable = true;
 
@@ -50,7 +51,6 @@
       };
     };
 
-    # rebuild on ARM
     targetSystem = lib.nixosSystem {
       pkgs = crossPkgs;
       modules = [
@@ -58,10 +58,9 @@
       ];
     };
 
-    # build on x86 - passes targetSystem so the u-boot module can use aarch64 toplevel
     sdImageSystem = lib.nixosSystem {
       inherit pkgs;
-      specialArgs = { inherit targetSystem; };
+      specialArgs = {inherit targetSystem;};
       modules = [
         minimalModule
       ];

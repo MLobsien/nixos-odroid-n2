@@ -1,7 +1,6 @@
 {
-  pkgs,
-  lib,
   modulesPath,
+  pkgs,
   ...
 }: {
   imports = [
@@ -13,19 +12,13 @@
   ];
 
   boot = {
-    consoleLogLevel = lib.mkDefault 7;
-    kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
     loader.grub.enable = false;
+    kernelPackages = pkgs.linuxPackages_latest;
+    kernelParams = [
+      "console=ttyAML0,115200n8"
+      "fsck.fix=yes"
+      "fsck.repair=yes"
+      "hdmitx=cec3f"
+    ];
   };
-
-  # Let the device tree be auto-detected or pass via kernel params.
-  # Note: cross-compiled kernel needs FDTDIR in the boot partition,
-  # which isn't available in the sd-image without extra configuration.
-  # Instead, pass the dtb via kernel params in boot.kernelParams.
-  boot.kernelParams = lib.mkDefault [
-    "console=ttyAML0,115200n8"
-    "fsck.fix=yes"
-    "fsck.repair=yes"
-    "hdmitx=cec3f"
-  ];
 }
