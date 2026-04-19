@@ -1,6 +1,7 @@
 {
   modulesPath,
-  targetSystem,
+  # targetSystem,
+  pkgs,
   ...
 }: {
   imports = [
@@ -13,7 +14,8 @@
 
   boot = {
     loader.grub.enable = false;
-    kernelPackages = targetSystem.pkgs.linuxPackages_latest;
+    # kernelPackages = targetSystem.pkgs.linuxPackages_latest;
+    kernelPackages = pkgs.linuxPackages_latest;
     kernelParams = [
       "console=ttyAML0,115200n8"
       "fsck.fix=yes"
