@@ -4,7 +4,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixos-odroid-n2 = {
-      url = "github:MLobsien/nixos-odroid-n2";
+      # url = "github:MLobsien/nixos-odroid-n2";
+      url = "path:..";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -22,18 +23,20 @@
       config.allowBroken = true;
     };
 
-    # Cross aarch64 pkgs — cross-compiled on x86_64 for aarch64 Odroid N2.
-    # crossSystem sets target to aarch64-linux while building natively on x86_64.
-    crossPkgs = import nixpkgs {
-      system = "x86_64-linux";
-      crossSystem = "aarch64-linux";
-      config.allowBroken = true;
-    };
+    # # Cross aarch64 pkgs — cross-compiled on x86_64 for aarch64 Odroid N2.
+    # # crossSystem sets target to aarch64-linux while building natively on x86_64.
+    # crossPkgs = import nixpkgs {
+    #   system = "x86_64-linux";
+    #   crossSystem = "aarch64-linux";
+    #   config.allowBroken = true;
+    # };
 
-    minimalModule = {
+    minimalModule = {pkgs, ...}: {
       imports = [
         nixos-odroid-n2.nixosModules.default
       ];
+
+      environment.systemPackages = [pkgs.vim];
 
       boot.loader.u-boot.enable = true;
 
@@ -51,16 +54,16 @@
       };
     };
 
-    targetSystem = lib.nixosSystem {
-      pkgs = crossPkgs;
-      modules = [
-        minimalModule
-      ];
-    };
+    # targetSystem = lib.nixosSystem {
+    #   pkgs = crossPkgs;
+    #   specialArgs.targetSystem.pkgs = crossPkgs;
+    #   modules = [
+    #     minimalModule
+    #   ];
+    # };
 
     sdImageSystem = lib.nixosSystem {
-      inherit pkgs;
-      specialArgs = {inherit targetSystem;};
+      pkgs = pkgs.pkgsCross.aarch64-multiplatform;
       modules = [
         minimalModule
       ];
@@ -68,6 +71,6 @@
   in {
     packages.x86_64-linux.default = sdImageSystem.config.system.build.sdImage;
 
-    nixosConfigurations.default = targetSystem;
+    # nixosConfigurations.default = targetSystem;
   };
 }

@@ -7,18 +7,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1776605363,
-        "narHash": "sha256-nSXQiNDnHHj8RioRxxCvxuoqnmILM5tacUteHhC749A=",
-        "owner": "MLobsien",
-        "repo": "nixos-odroid-n2",
-        "rev": "09655a592c78fd0e1df10f5857dcf0682991395f",
-        "type": "github"
+        "path": "..",
+        "type": "path"
       },
       "original": {
-        "owner": "MLobsien",
-        "repo": "nixos-odroid-n2",
-        "type": "github"
-      }
+        "path": "..",
+        "type": "path"
+      },
+      "parent": []
     },
     "nixpkgs": {
       "locked": {
